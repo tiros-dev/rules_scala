@@ -23,5 +23,5 @@ scala_binary(
 
 java_import(
   name = "scala_parsers",
-  jars = ["@scala//:lib/scala-parser-combinators_2.11-1.0.4.jar"],
+  jars = ["@scala//:lib/scala-parser-combinators_2.12-1.0.5.jar"],
 )

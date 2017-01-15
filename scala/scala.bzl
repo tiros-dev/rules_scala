@@ -499,7 +499,7 @@ _implicit_deps = {
   "_scalalib": attr.label(default=Label("@scala//:lib/scala-library.jar"), single_file=True, allow_files=True),
   "_scalareflect": attr.label(default=Label("@scala//:lib/scala-reflect.jar"), single_file=True, allow_files=True),
   "_scalacompiler": attr.label(default=Label("@scala//:lib/scala-compiler.jar"), single_file=True, allow_files=True),
-  "_scalaxml": attr.label(default=Label("@scala//:lib/scala-xml_2.11-1.0.4.jar"), single_file=True, allow_files=True),
+  "_scalaxml": attr.label(default=Label("@scala//:lib/scala-xml_2.12-1.0.6.jar"), single_file=True, allow_files=True),
   "_scalasdk": attr.label(default=Label("@scala//:sdk"), allow_files=True),
   "_scalareflect": attr.label(default=Label("@scala//:lib/scala-reflect.jar"), single_file=True, allow_files=True),
   "_java": attr.label(executable=True, cfg="host", default=Label("@bazel_tools//tools/jdk:java"), single_file=True, allow_files=True),
@@ -519,8 +519,8 @@ _common_attrs = {
   "data": attr.label_list(allow_files=True, cfg="data"),
   "resources": attr.label_list(allow_files=True),
   "resource_strip_prefix": attr.string(),
-  "scalacopts":attr.string_list(),
-  "javacopts":attr.string_list(),
+  "scalacopts": attr.string_list(),
+  "javacopts": attr.string_list(),
   "jvm_flags": attr.string_list(),
   "print_compile_time": attr.bool(default=False, mandatory=False),
 }
@@ -570,6 +570,7 @@ scala_test = rule(
   attrs={
       "main_class": attr.string(default="org.scalatest.tools.Runner"),
       "suites": attr.string_list(),
+      "_scalactic": attr.label(default=Label("@scalactic//file"), single_file=True, allow_files=True),
       "_scalatest": attr.label(default=Label("@scalatest//file"), single_file=True, allow_files=True),
       "_scalatest_reporter": attr.label(default=Label("//scala/support:test_reporter")),
       } + _implicit_deps + _common_attrs,
@@ -591,7 +592,7 @@ scala_repl = rule(
 
 def scala_version():
   """return the scala version for use in maven coordinates"""
-  return "2.11"
+  return "2.12"
 
 def scala_mvn_artifact(artifact):
   gav = artifact.split(":")
@@ -607,23 +608,19 @@ exports_files([
   "bin/scalac",
   "bin/scaladoc",
   "lib/config-1.2.1.jar",
-  "lib/jline-2.12.1.jar",
-  "lib/scala-actors-2.11.0.jar",
-  "lib/scala-actors-migration_2.11-1.1.0.jar",
+  "lib/jline-2.14.1.jar",
   "lib/scala-compiler.jar",
-  "lib/scala-continuations-library_2.11-1.0.2.jar",
-  "lib/scala-continuations-plugin_2.11.8-1.0.2.jar",
   "lib/scala-library.jar",
-  "lib/scala-parser-combinators_2.11-1.0.4.jar",
+  "lib/scala-parser-combinators_2.12-1.0.4.jar",
   "lib/scala-reflect.jar",
-  "lib/scala-swing_2.11-1.0.2.jar",
-  "lib/scala-xml_2.11-1.0.4.jar",
-  "lib/scalap-2.11.8.jar",
+  "lib/scala-swing_2.12-2.0.0-M2.jar",
+  "lib/scala-xml_2.12-1.0.6.jar",
+  "lib/scalap-2.12.1.jar",
 ])
 
 filegroup(
     name = "sdk",
-    # For some reason, the SDK zip contains a baked-in version of akka. We need
+    # For some reason, the 2.11 SDK zip contains a baked-in version of akka. We need
     # to explicitly exclude it here, otherwise the scala compiler will grab it
     # and put it on its classpath.
     srcs = glob(["**"], exclude=["lib/akka-actor_2.11-2.3.10.jar"]),
@@ -634,15 +631,22 @@ filegroup(
 def scala_repositories():
   native.new_http_archive(
     name = "scala",
-    strip_prefix = "scala-2.11.8",
-    sha256 = "87fc86a19d9725edb5fd9866c5ee9424cdb2cd86b767f1bb7d47313e8e391ace",
-    url = "http://bazel-mirror.storage.googleapis.com/downloads.typesafe.com/scala/2.11.8/scala-2.11.8.tgz",
+    strip_prefix = "scala-2.12.1",
+    sha256 = "4db068884532a3e27010df17befaca0f06ea50f69433d58e06a5e63c7a3cc359",
+    urls = ["https://www.scala-lang.org/files/archive/scala-2.12.1.tgz"],
     build_file_content = SCALA_BUILD_FILE,
   )
+
   native.http_file(
     name = "scalatest",
-    url = "http://bazel-mirror.storage.googleapis.com/oss.sonatype.org/content/groups/public/org/scalatest/scalatest_2.11/2.2.6/scalatest_2.11-2.2.6.jar",
-    sha256 = "f198967436a5e7a69cfd182902adcfbcb9f2e41b349e1a5c8881a2407f615962",
+    urls = ["http://central.maven.org/maven2/org/scalatest/scalatest_2.12/3.0.1/scalatest_2.12-3.0.1.jar"],
+    sha256 = "47b8b0a75b9f127cf1df6c9e3547487f13487deed946a682dacf56b923f1f24a",
+  )
+
+  native.http_file(
+    name = "scalactic",
+    urls = ["http://central.maven.org/maven2/org/scalactic/scalactic_2.12/3.0.1/scalactic_2.12-3.0.1.jar"],
+    sha256 = "e4b28f505042f13af90698ddf9950c574872cab83daac34063516f648d008cb3",
   )
 
   native.maven_server(
