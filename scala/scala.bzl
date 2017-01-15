@@ -996,6 +996,7 @@ scala_test = rule(
       "suites": attr.string_list(),
       "colors": attr.bool(default=True),
       "full_stacktraces": attr.bool(default=True),
+      "_scalactic": attr.label(default=Label("//external:io_bazel_rules_scala/dependency/scalactic/scalactic"), allow_files=True),
       "_scalatest": attr.label(default=Label("//external:io_bazel_rules_scala/dependency/scalatest/scalatest"), allow_files=True),
       "_scalatest_runner": attr.label(executable=True, cfg="host", default=Label("//src/java/io/bazel/rulesscala/scala_test:runner.jar"), allow_files=True),
       "_scalatest_reporter": attr.label(default=Label("//scala/support:test_reporter")),
@@ -1018,13 +1019,13 @@ SCALA_BUILD_FILE = """
 # scala.BUILD
 java_import(
     name = "scala-xml",
-    jars = ["lib/scala-xml_2.11-1.0.5.jar"],
+    jars = ["lib/scala-xml_2.12-1.0.6.jar"],
     visibility = ["//visibility:public"],
 )
 
 java_import(
     name = "scala-parser-combinators",
-    jars = ["lib/scala-parser-combinators_2.11-1.0.4.jar"],
+    jars = ["lib/scala-parser-combinators_2.12-1.0.6.jar"],
     visibility = ["//visibility:public"],
 )
 
@@ -1050,17 +1051,23 @@ java_import(
 def scala_repositories():
   native.new_http_archive(
     name = "scala",
-    strip_prefix = "scala-2.11.11",
-    sha256 = "12037ca64c68468e717e950f47fc77d5ceae5e74e3bdca56f6d02fd5bfd6900b",
-    url = "https://downloads.lightbend.com/scala/2.11.11/scala-2.11.11.tgz",
+    strip_prefix = "scala-2.12.4",
+    sha256 = "9554a0ca31aa8701863e881281b1772370a87e993ce785bb24505f2431292a21",
+    urls = ["https://www.scala-lang.org/files/archive/scala-2.12.4.tgz"],
     build_file_content = SCALA_BUILD_FILE,
   )
 
   # scalatest has macros, note http_jar is invoking ijar
   native.http_jar(
     name = "scalatest",
-    url = "https://mirror.bazel.build/oss.sonatype.org/content/groups/public/org/scalatest/scalatest_2.11/2.2.6/scalatest_2.11-2.2.6.jar",
-    sha256 = "f198967436a5e7a69cfd182902adcfbcb9f2e41b349e1a5c8881a2407f615962",
+    url = "http://central.maven.org/maven2/org/scalatest/scalatest_2.12/3.0.4/scalatest_2.12-3.0.4.jar",
+    sha256 = "cf2a7999681567e0f0e0166756356ae4ab0cd6c83f3f1d70225d25bb87d26070",
+  )
+
+  native.http_jar(
+    name = "scalactic",
+    url = "http://central.maven.org/maven2/org/scalactic/scalactic_2.12/3.0.4/scalactic_2.12-3.0.4.jar",
+    sha256 = "9b28aa46faaa666a8a10a5173fb72975d59c363c31c3e5f6a27eacc2e654cdfa",
   )
 
   native.maven_server(
@@ -1097,6 +1104,8 @@ def scala_repositories():
   native.bind(name = "io_bazel_rules_scala/dependency/scala/scala_reflect", actual = "@scala//:scala-reflect")
 
   native.bind(name = "io_bazel_rules_scala/dependency/scala/scala_xml", actual = "@scala//:scala-xml")
+
+  native.bind(name = "io_bazel_rules_scala/dependency/scalactic/scalactic", actual = "@scalactic//jar")
 
   native.bind(name = "io_bazel_rules_scala/dependency/scalatest/scalatest", actual = "@scalatest//jar")
 
