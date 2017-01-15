@@ -670,6 +670,7 @@ scala_test = rule(
   attrs={
       "main_class": attr.string(default="org.scalatest.tools.Runner"),
       "suites": attr.string_list(),
+      "_scalactic": attr.label(default=Label("@scalactic//jar"), single_file=True, allow_files=True),
       "_scalatest": attr.label(default=Label("@scalatest//jar"), single_file=True, allow_files=True),
       "_scalatest_reporter": attr.label(default=Label("//scala/support:test_reporter")),
       "_scalaxml": attr.label(default=Label("@scala//:scala-xml"), single_file=True, allow_files=True),
@@ -692,7 +693,7 @@ scala_repl = rule(
 
 def scala_version():
   """return the scala version for use in maven coordinates"""
-  return "2.11"
+  return "2.12"
 
 def scala_mvn_artifact(artifact):
   gav = artifact.split(":")
@@ -705,13 +706,13 @@ SCALA_BUILD_FILE = """
 # scala.BUILD
 java_import(
     name = "scala-xml",
-    jars = ["lib/scala-xml_2.11-1.0.4.jar"],
+    jars = ["lib/scala-xml_2.12-1.0.6.jar"],
     visibility = ["//visibility:public"],
 )
 
 java_import(
     name = "scala-parser-combinators",
-    jars = ["lib/scala-parser-combinators_2.11-1.0.4.jar"],
+    jars = ["lib/scala-parser-combinators_2.12-1.0.4.jar"],
     visibility = ["//visibility:public"],
 )
 
@@ -737,16 +738,22 @@ java_import(
 def scala_repositories():
   native.new_http_archive(
     name = "scala",
-    strip_prefix = "scala-2.11.8",
-    sha256 = "87fc86a19d9725edb5fd9866c5ee9424cdb2cd86b767f1bb7d47313e8e391ace",
-    url = "http://bazel-mirror.storage.googleapis.com/downloads.typesafe.com/scala/2.11.8/scala-2.11.8.tgz",
+    strip_prefix = "scala-2.12.2",
+    sha256 = "196168b246fcf10e275491c5e58a50ca9eb696da95e49155b3f86f001346a6f5",
+    urls = ["https://www.scala-lang.org/files/archive/scala-2.12.2.tgz"],
     build_file_content = SCALA_BUILD_FILE,
   )
 
   native.http_jar(
     name = "scalatest",
-    url = "http://bazel-mirror.storage.googleapis.com/oss.sonatype.org/content/groups/public/org/scalatest/scalatest_2.11/2.2.6/scalatest_2.11-2.2.6.jar",
-    sha256 = "f198967436a5e7a69cfd182902adcfbcb9f2e41b349e1a5c8881a2407f615962",
+    url = "http://central.maven.org/maven2/org/scalatest/scalatest_2.12/3.0.1/scalatest_2.12-3.0.1.jar",
+    sha256 = "47b8b0a75b9f127cf1df6c9e3547487f13487deed946a682dacf56b923f1f24a",
+  )
+
+  native.http_jar(
+    name = "scalactic",
+    url = "http://central.maven.org/maven2/org/scalactic/scalactic_2.12/3.0.1/scalactic_2.12-3.0.1.jar",
+    sha256 = "e4b28f505042f13af90698ddf9950c574872cab83daac34063516f648d008cb3",
   )
 
   native.maven_server(
