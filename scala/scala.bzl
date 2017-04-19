@@ -738,9 +738,9 @@ java_import(
 def scala_repositories():
   native.new_http_archive(
     name = "scala",
-    strip_prefix = "scala-2.12.2",
-    sha256 = "196168b246fcf10e275491c5e58a50ca9eb696da95e49155b3f86f001346a6f5",
-    urls = ["https://www.scala-lang.org/files/archive/scala-2.12.2.tgz"],
+    strip_prefix = "scala-2.12.1",
+    sha256 = "4db068884532a3e27010df17befaca0f06ea50f69433d58e06a5e63c7a3cc359",
+    urls = ["https://www.scala-lang.org/files/archive/scala-2.12.1.tgz"],
     build_file_content = SCALA_BUILD_FILE,
   )
 
